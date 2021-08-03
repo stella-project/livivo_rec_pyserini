@@ -76,7 +76,6 @@ class Recommender(object):
         with jsonlines.open('./data/livivo/publications/publications.jsonl') as reader:
             for obj in reader:
                 self.title_lookup[obj.get('DBRECORDID')] = obj.get('TITLE')
-        print(self.title_lookup)
 
 
     def recommend_publications(self, item_id, page, rpp):
@@ -85,7 +84,6 @@ class Recommender(object):
 
         doc_title = self.title_lookup.get(item_id)
 
-        print(doc_title)
         if doc_title is not None:
             hits = self.searcher.search(doc_title[0])
 
