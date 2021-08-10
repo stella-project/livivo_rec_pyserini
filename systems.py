@@ -35,17 +35,19 @@ class Recommender(object):
     def index(self):
 
         data = []
-        with jsonlines.open('./data/livivo/publications/publications.jsonl') as reader:
-            for obj in reader:
-                title = obj.get('TITLE') or ''
-                title = title[0] if type(title) is list else title
-                abstract = obj.get('ABSTRACT') or ''
-                abstract = abstract[0] if type(abstract) is list else abstract
-                try:
-                    data.append({'id': obj.get('DBRECORDID'),
-                                 'contents': ' '.join([title, abstract])})
-                except Exception as e:
-                    print(e)
+        for file in os.listdir('./data/livivo/documents/'):
+            if file.endswith(".jsonl"):
+                with jsonlines.open(os.path.join('./data/livivo/documents', file)) as reader:
+                    for obj in reader:
+                        title = obj.get('TITLE') or ''
+                        title = title[0] if type(title) is list else title
+                        abstract = obj.get('ABSTRACT') or ''
+                        abstract = abstract[0] if type(abstract) is list else abstract
+                        try:
+                            data.append({'id': obj.get('DBRECORDID'),
+                                         'contents': ' '.join([title, abstract])})
+                        except Exception as e:
+                            print(e)
 
         try:
             os.mkdir('./convert/')
@@ -72,10 +74,11 @@ class Recommender(object):
 
         JIndexCollection.main(args)
         self.searcher = SimpleSearcher('./index/')
-
-        with jsonlines.open('./data/livivo/publications/publications.jsonl') as reader:
-            for obj in reader:
-                self.title_lookup[obj.get('DBRECORDID')] = obj.get('TITLE')
+        for file in os.listdir('./data/livivo/documents/'):
+            if file.endswith(".jsonl"):
+                with jsonlines.open(os.path.join('./data/livivo/documents', file)) as reader:
+                    for obj in reader:
+                        self.title_lookup[obj.get('DBRECORDID')] = obj.get('TITLE')
 
 
     def recommend_publications(self, item_id, page, rpp):
